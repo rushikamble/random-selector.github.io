@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Random Selector</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <script>
+        function randomSelect () {
+
+            const inpObj = document.getElementById("request").value
+            let length = inpObj.length;
+            if (length > 1) {
+                document.getElementById("result").innerHTML = "";
+                const button = document.getElementById('submit-button');
+                // Set the disabled attribute
+                button.setAttribute('disabled', '');
+                var data = JSON.stringify({ "request": inpObj });
+                const response = fetch('https://shielded-everglades-45789.herokuapp.com/random-select', {
+                    method: 'POST',
+                    body: data, // string or object
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function (response) {
+                    return response.json(); //extract JSON from the http response
+                    // do something with myJson
+                }).then((data) => {
+                    document.getElementById("result").innerHTML = "<p>Your selection is <strong>" + data["result"] + "</strong></p>";
+                    //  Remove the disabled attribute
+                    button.removeAttribute('disabled');
+                }).catch((error) => {
+                    console.error('Error:', error);
+                    document.getElementById("result").innerHTML = "Server Error -" + error
+                    // Remove the disabled attribute
+                    button.removeAttribute('disabled');
+                });;
+            } else {
+                document.getElementById("result").innerHTML = "<strong>Please add more than 1 input value </strong>";
+            }
+
+
+        }
+        // Body Init
+        function init () {
+            document.getElementById("result").innerHTML = "";
+            const response = fetch('https://api.quotable.io/random', {
+                method: 'GET'
+            }).then(function (response) {
+                return response.json(); //extract JSON from the http response
+                // do something with myJson
+            }).then((data) => {
+                document.getElementById("blockquote").innerHTML = '<p>"' + data["content"] + '"</p>';
+                document.getElementById("author").innerHTML = '<cite>- ' + data["author"] + '</cite>';
+            });
+        }
+    </script>
+    <style>
+        blockquote {
+            margin: 0;
+        }
+
+        blockquote p {
+            padding: 15px;
+            background: #eee;
+            border-radius: 5px;
+            width: fit-content;
+        }
+
+        blockquote p::before {
+            content: '\201C';
+        }
+
+        blockquote p::after {
+            content: '\201D';
+        }
+    </style>
+</head>
+
+<body onload="init()">
+    <br>
+
+    <strong><i>
+            Random quote -
+        </i></strong>
+    <figure>
+        <blockquote id="blockquote">
+        </blockquote>
+        <figcaption id="author"></figcaption>
+    </figure>
+    <h1>Randomize Selector</h1>
+    <p>If you are confused between multiple options, Please add all the options seperated by Comma ( , ) in the
+        following text area and hit RANDOM SELECT button</p>
+    <label>Your Options:</label>
+    <br>
+    <textarea required id="request" rows="10" cols="30"></textarea>
+    <br>
+    <br>
+    <button id="submit-button" onclick="randomSelect()">RANDOM SELECT</button>
+    <br>
+    <br>
+    <br>
+    <p id="result"></p>
+</body>
+
+</html>
